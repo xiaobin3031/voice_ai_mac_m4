@@ -1,0 +1,16 @@
+# 基础
+sounddevice
+wavio
+openai-whisper
+transformers
+datasets
+accelerate
+gradio
+pydub
+
+
+# 如果用 huggingface 推理（可选）
+# torch
+
+
+# 若使用其他 TTS/ASR 绑定，根据实际替换
