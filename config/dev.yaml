@@ -1,0 +1,8 @@
+# 所有为空的，都在本地的.env文件中
+
+
+llm:
+  model-name: deepseek-r1:7b # gpt-oss:20b
+
+amap:  # 高德地图api-key
+  key:

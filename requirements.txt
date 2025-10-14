@@ -7,6 +7,10 @@ datasets
 accelerate
 gradio
 pydub
+pyyaml
+edge_tts
+simpleaudio
+openpyxl
 
 
 # 如果用 huggingface 推理（可选）
@@ -14,3 +18,7 @@ pydub
 
 
 # 若使用其他 TTS/ASR 绑定，根据实际替换
+
+
+# 其他依赖 单独安装，注释只是避免 pip install -r requirements.txt 时报错
+# ollama <a href="https://ollama.com/">ollama官网</a>
