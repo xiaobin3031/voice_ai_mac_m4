@@ -29,7 +29,7 @@ class Weather(BaseModule):
         result = llm.ask(f"{text} {llm_msg}")
         weather_info = json.loads(result)
         if weather_info.get('place') is None:
-            amap_location = self.__location()
+            amap_location = self.location()
             if amap_location['status'] == 1:
                 weather_info['place'] = amap_location['city']
         
@@ -37,29 +37,37 @@ class Weather(BaseModule):
             tts.speak("请告诉我你的位置")
             return
         
+        citycode = self.get_city_code(weather_info['place']) 
+        if citycode is None:
+            return
+
+        weather_info['adcode'] = citycode
+        weather = self.query_weather(weather_info)
+        print("weather result: ", weather)
+        if weather['status'] == 1 and len(weather['lives']) > 0:
+            lives = weather['lives'][0]
+            tts.speak(f"{lives['city']}{lives['weather']} {lives['temperature']}度")
+        else:
+            tts.speak(weather.get('info', '天气查询失败'))
+    def again(self, text):
+        pass
+
+
+    def get_city_code(self, place):
         ccs = data.load()
-        citycode = ccs.get(weather_info['place']) 
+        citycode = ccs.get(place) 
         if citycode is None:
             for suffix in location_suffix:
-                citycode = ccs.get(weather_info['place'] + suffix)
+                citycode = ccs.get(place + suffix)
                 if citycode is not None:
                     break
         if citycode is None:
             tts.speak("请告诉我你的位置")
-            return
-
-        weather_info['adcode'] = citycode
-        weather = self.__query_weather(weather_info)
-        print("weather result: ", weather)
-        if weather['status'] == 0:
-            tts.speak(weather.get('info', '天气查询失败'))
+            return None
         else:
-            lives = weather['lives']
-            tts.speak(f"{lives['city']}{lives['weather']} {lives['temperature']}度")
-    def again(self, text):
-        pass
+            return citycode['adcode']
 
-    def __query_weather(self, weather_info):
+    def query_weather(self, weather_info):
         params = {}
         params['key'] = config['amap']['key']
         params['city'] = weather_info['adcode']
@@ -72,11 +80,12 @@ class Weather(BaseModule):
             logger.exception(error)
             return {"status": 0, "info": error}
 
-    def __location():
+    def location(self):
         params = {}
         params['key'] = config['amap']['key']
+        print('location params', params)
         try:
-            response = urlopen("https://restapi.amap.com/v3/ip" + urlencode(params))
+            response = urlopen("https://restapi.amap.com/v3/ip?" + urlencode(params))
             return json.load(response)
         except HTTPError as e:
             error = e.fp.read().decode()
