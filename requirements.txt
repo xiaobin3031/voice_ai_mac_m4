@@ -11,6 +11,8 @@ pyyaml
 edge_tts
 simpleaudio
 openpyxl
+pypinyin
+lxml
 
 
 # 如果用 huggingface 推理（可选）
